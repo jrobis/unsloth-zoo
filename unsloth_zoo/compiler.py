@@ -927,7 +927,7 @@ loss = loss_fct(shift_logits, shift_labels)
 """
 
 cross_entropy_replacement_1 = """
-NOT_RETURN_LOGITS = os.environ.get('UNSLOTH_RETURN_LOGITS', '0') == '0'
+NOT_RETURN_LOGITS = False  # PATCHED: Always return logits for custom loss
 RETURN_HIDDEN_STATES = os.environ.get("UNSLOTH_RETURN_HIDDEN_STATES", "0") == "1"
 
 n_items = None
@@ -1002,7 +1002,7 @@ if labels is not None:$SPACES$loss = self.loss_function($NEWLINES$$LOGITS$, $LAB
 """
 
 cross_entropy_replacement_2 = """
-NOT_RETURN_LOGITS = os.environ.get('UNSLOTH_RETURN_LOGITS', '0') == '0'
+NOT_RETURN_LOGITS = False  # PATCHED: Always return logits for custom loss
 RETURN_HIDDEN_STATES = os.environ.get("UNSLOTH_RETURN_HIDDEN_STATES", "0") == "1"
 
 n_items = None
@@ -1101,7 +1101,7 @@ loss = loss_fct(shift_logits, shift_labels)
 """
 
 cross_entropy_replacement_3 = """
-NOT_RETURN_LOGITS = os.environ.get('UNSLOTH_RETURN_LOGITS', '0') == '0'
+NOT_RETURN_LOGITS = False  # PATCHED: Always return logits for custom loss
 RETURN_HIDDEN_STATES = os.environ.get("UNSLOTH_RETURN_HIDDEN_STATES", "0") == "1"
 
 all_locals = locals()
@@ -1328,7 +1328,7 @@ def apply_fused_lm_head(forward, module = None):
         # Return logits back
         if "logits = outputs.logits" in cross_entropy_find:
             forward = forward.replace(
-                "logits = self.lm_head(hidden_states[:, slice_indices, :]) if os.environ.get('UNSLOTH_RETURN_LOGITS', '0') == '1' else EMPTY_LOGITS",
+                "logits = self.lm_head(hidden_states[:, slice_indices, :])",
                 "logits = outputs.logits",
             )
         # Fix vocab_size = (vocab_size=
