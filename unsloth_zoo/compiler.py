@@ -1311,8 +1311,10 @@ def apply_fused_lm_head(forward, module = None):
         replacement = cross_entropy_replacement.strip().split("\n")
         replacement = "\n".join((len(spaces)-4)*" " + x for x in replacement)
         replacement = \
-            "logits = self.lm_head(hidden_states[:, slice_indices, :]) if os.environ.get('UNSLOTH_RETURN_LOGITS', '0') == '1' else EMPTY_LOGITS\n" + \
+            "# PATCHED: Always return logits for custom loss functions\n" + \
+            (len(spaces)-4)*" " + "logits = self.lm_head(hidden_states[:, slice_indices, :])\n" + \
             (len(spaces)-4)*" " + "loss = None\n" + \
+            (len(spaces)-4)*" " + "NOT_RETURN_LOGITS = False  # PATCHED: Always return logits\n" + \
             replacement + "\n"
         try:
             forward = regex.sub(
